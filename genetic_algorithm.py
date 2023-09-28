@@ -4,12 +4,18 @@ import numpy as np
 
 
 def fitness(n_queen):
-    """
-    :param n_queen: String instance of nqueens problem '13....n'
+    # Initialize the number of conflicts to 0.
+    num_conflicts = 0
 
-    :return: How many conflicts we have in
-    """
-    return -1
+    # Iterate over all queens.
+    for i in range(len(n_queen)):
+        # Check if the current queen is attacking any other queen.
+        for j in range(i + 1, len(n_queen)):
+            # If the two queens are in the same row, column, or diagonal, then they are attacking each other.
+            if n_queen[i] == n_queen[j] or abs(i - j) == abs(int(n_queen[i]) - int(n_queen[j])):
+                num_conflicts += 1
+
+    return num_conflicts
 
 
 def generate_initial_population(n: int, population_size: int):
@@ -38,7 +44,10 @@ def generate_initial_population(n: int, population_size: int):
 
     print(population_list)
 
-    return -1
+    return population_list
 
 
-generate_initial_population(9, 15)
+x = generate_initial_population(9, 15)
+print(fitness(x[0]))
+print(fitness(x[1]))
+print(fitness(x[2]))
