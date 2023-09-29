@@ -182,7 +182,7 @@ def run_genetic_algorithm():
                 return state
 
         counter += 1
-        breeding_pairs = breeding_children
+        breeding_set = breeding_children
 
 
 run_genetic_algorithm()
