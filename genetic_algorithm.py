@@ -20,7 +20,20 @@ word_to_number = {
     "15": "F",
     "16": "G",
     "17": "H",
-    "18": "I"
+    "18": "I",
+    "19": "J",
+    "20": "K",
+    "21": "L",
+    "22": "M",
+    "23": "N",
+    "24": "O",
+    "25": "P",
+    "26": "Q",
+    "27": "R",
+    "28": "S",
+    "29": "T",
+    "30": "U",
+    "31": "V"
 }
 number_to_word = {
     "1": "1",
@@ -40,7 +53,21 @@ number_to_word = {
     "F": "15",
     "G": "16",
     "H": "17",
-    "I": "18"
+    "I": "18",
+    "J": "19",
+    "K": "20",
+    "L": "21",
+    "M": "22",
+    "N": "23",
+    "O": "24",
+    "P": "25",
+    "Q": "26",
+    "R": "27",
+    "S": "28",
+    "T": "29",
+    "U": "30",
+    "V": "31"
+
 }
 
 
@@ -204,7 +231,7 @@ def crossover(breeding_pairs):
 
 
 def run_genetic_algorithm():
-    x = generate_initial_population(13)
+    x = generate_initial_population(31)
     x = sort_by_fitness(x)
     breeding_set = sort_by_fitness(list(choose_parents(x)))
     counter = 0
