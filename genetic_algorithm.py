@@ -2,6 +2,48 @@ import random
 
 import numpy as np
 
+word_to_number = {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "A",
+    "11": "B",
+    "12": "C",
+    "13": "D",
+    "14": "E",
+    "15": "F",
+    "16": "G",
+    "17": "H",
+    "18": "I"
+}
+number_to_word = {
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "A": "10",
+    "B": "11",
+    "C": "12",
+    "D": "13",
+    "E": "14",
+    "F": "15",
+    "G": "16",
+    "H": "17",
+    "I": "18"
+}
+
+
 
 def fitness(n_queen):
     # Initialize the number of conflicts to 0.
@@ -12,7 +54,7 @@ def fitness(n_queen):
         # Check if the current queen is attacking any other queen.
         for j in range(i + 1, len(n_queen)):
             # If the two queens are in the same row, column, or diagonal, then they are attacking each other.
-            if n_queen[i] == n_queen[j] or abs(i - j) == abs(int(n_queen[i]) - int(n_queen[j])):
+            if n_queen[i] == n_queen[j] or abs(i - j) == abs(int(number_to_word[n_queen[i]]) - int(number_to_word[n_queen[j]])):
                 num_conflicts += 1
 
     return num_conflicts
@@ -33,15 +75,24 @@ def generate_initial_population(n: int):
     initial = ""
     population_size = int((n * n) * np.ceil(np.log2(n)))
     for i in range(1, n + 1):
-        initial += str(i)
+        initial += str(word_to_number[str(i)])
 
+    print(initial)
     # Create a set of permutations
+    """
     from itertools import permutations
     perms = [''.join(p) for p in permutations(initial)]
     perms = set(perms)
+    """
+
+    population_list = []
+    while len(population_list) < population_size:
+        word = ''.join(random.sample(initial, len(initial)))
+        if word not in population_list:
+            population_list.append(word)
 
     # Selecting N random elements from the set for initial population
-    population_list = random.sample(list(perms), population_size)
+    # population_list = random.sample(list(initial), population_size)
 
     return population_list
 
@@ -153,7 +204,7 @@ def crossover(breeding_pairs):
 
 
 def run_genetic_algorithm():
-    x = generate_initial_population(9)
+    x = generate_initial_population(13)
     x = sort_by_fitness(x)
     breeding_set = sort_by_fitness(list(choose_parents(x)))
     counter = 0
