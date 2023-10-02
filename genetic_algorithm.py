@@ -71,7 +71,6 @@ number_to_word = {
 }
 
 
-
 def fitness(n_queen):
     # Initialize the number of conflicts to 0.
     num_conflicts = 0
@@ -81,7 +80,8 @@ def fitness(n_queen):
         # Check if the current queen is attacking any other queen.
         for j in range(i + 1, len(n_queen)):
             # If the two queens are in the same row, column, or diagonal, then they are attacking each other.
-            if n_queen[i] == n_queen[j] or abs(i - j) == abs(int(number_to_word[n_queen[i]]) - int(number_to_word[n_queen[j]])):
+            if n_queen[i] == n_queen[j] or abs(i - j) == abs(
+                    int(number_to_word[n_queen[i]]) - int(number_to_word[n_queen[j]])):
                 num_conflicts += 1
 
     return num_conflicts
@@ -230,8 +230,34 @@ def crossover(breeding_pairs):
     return child1, child2
 
 
+def mutate(child):
+    for i in range(len(child)):
+        # Max Length of Child aka number of Ns
+        max_len = len(child[i])
+        # Randomly select a number between 0 and 100
+        # If the number is less than 5% then mutate
+        if random.randint(0, 100) <= 5:
+            print("Mutating: ", child[i], "to:")
+            a = -1
+            b = -1
+            while a == b:
+                a = random.randint(0, max_len - 1)
+                b = random.randint(0, max_len - 1)
+            # Swap char a with char b
+
+            charmin = child[i][min(a, b)]
+            charmax = child[i][max(a, b)]
+
+            child[i] = child[i].replace(charmax, charmin)
+            child[i] = child[i].replace(charmin, charmax, 1)
+
+            print(child[i])
+
+    return child
+
+
 def run_genetic_algorithm():
-    x = generate_initial_population(31)
+    x = generate_initial_population(20)
     x = sort_by_fitness(x)
     breeding_set = sort_by_fitness(list(choose_parents(x)))
     counter = 0
@@ -245,12 +271,15 @@ def run_genetic_algorithm():
         breeding_children = []
         while len(breeding_children) < 50:
             for pair in breeding_pairs:
+                # Error here think there is no possible children generated and gets stuck in endless loop
                 child1, child2 = crossover(pair)
                 if child1 not in breeding_children and len(breeding_children) < 50:
                     breeding_children.append(child1)
                 if child2 not in breeding_children and len(breeding_children) < 50:
                     breeding_children.append(child2)
 
+        # Send Children through mutate function
+        breeding_children = mutate(breeding_children)
         breeding_children = sort_by_fitness(breeding_children)
 
         for state in breeding_children:
@@ -261,6 +290,13 @@ def run_genetic_algorithm():
 
         counter += 1
         breeding_set = breeding_children
+    return False
 
 
-run_genetic_algorithm()
+x = run_genetic_algorithm()
+
+print("Ran Correctly")
+
+x = run_genetic_algorithm()
+
+print("Ran Correctly")
