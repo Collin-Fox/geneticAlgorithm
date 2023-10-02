@@ -177,8 +177,8 @@ def crossover(breeding_pairs):
 
     # Randomly select two indices
     while i == j:
-        i = random.randint(0, len(a))
-        j = random.randint(0, len(a))
+        i = random.randint(0, len(a) - 1)
+        j = random.randint(0, len(a) - 1)
 
     # Make sure i < j
     min_index = min(i, j)
@@ -200,8 +200,8 @@ def crossover(breeding_pairs):
         if letter in p0_retained:
             p1_retained += letter
         else:
-            holder = holder.replace(letter, "?")
             p1_replaced += letter
+            holder = holder.replace(letter, "?")
 
     # Replace the positions needed to replace w ?'s
     replaceHolder = ""
@@ -222,6 +222,7 @@ def crossover(breeding_pairs):
     for letter in p0_retained:
         if letter == "?":
             p0_retained = p0_retained.replace("?", p1_replaced[0], 1)
+            #print(p0_retained)
             p1_replaced = p1_replaced[1:]
 
     child1 = p0_retained
@@ -271,15 +272,21 @@ def run_genetic_algorithm():
         breeding_children = []
         while len(breeding_children) < 50:
             for pair in breeding_pairs:
-                # Error here think there is no possible children generated and gets stuck in endless loop
                 child1, child2 = crossover(pair)
-                if child1 not in breeding_children and len(breeding_children) < 50:
+                mut_list = [child1, child2]
+                mut_list = mutate(mut_list)
+                child1 = mut_list[0]
+                child2 = mut_list[1]
+                if len(breeding_children) < 50:
                     breeding_children.append(child1)
-                if child2 not in breeding_children and len(breeding_children) < 50:
+                if len(breeding_children) < 50:
                     breeding_children.append(child2)
 
+            breeding_children = set(breeding_children)
+            breeding_children = list(breeding_children)
+
         # Send Children through mutate function
-        breeding_children = mutate(breeding_children)
+        #breeding_children = mutate(breeding_children)
         breeding_children = sort_by_fitness(breeding_children)
 
         for state in breeding_children:
@@ -289,14 +296,11 @@ def run_genetic_algorithm():
                 return state
 
         counter += 1
+        print("Generation: ", counter)
         breeding_set = breeding_children
     return False
 
 
 x = run_genetic_algorithm()
-
-print("Ran Correctly")
-
-x = run_genetic_algorithm()
-
-print("Ran Correctly")
+while x is False:
+    x = run_genetic_algorithm()
