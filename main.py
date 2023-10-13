@@ -1,59 +1,95 @@
 import random
-
-def is_valid_state(state):
-  """Checks if a given state is valid.
-
-  Args:
-    state: A string representing the state of the board.
-
-  Returns:
-    True if the state is valid, False otherwise.
-  """
-
-  for i in range(len(state)):
-    for j in range(i + 1, len(state)):
-      if state[i] == state[j] or abs(i - j) == abs(state[i] - state[j]):
-        return False
-  return True
-
-def generate_state(n):
-  """Generates a random state for the N-queens problem.
-
-  Args:
-    n: The number of queens.
-
-  Returns:
-    A string representing the state of the board.
-  """
-
-  state = ""
-  for i in range(n):
-    state += str(random.randint(0, n - 1))
-  return state
-
-def generate_states(n, x):
-  """Generates x random states for the N-queens problem.
-
-  Args:
-    n: The number of queens.
-    x: The number of states to generate.
-
-  Returns:
-    A list of strings representing the states of the board.
-  """
-
-  states = []
-  for i in range(x):
-    states.append(generate_state(n))
-  return states
+import numpy as np
+from itertools import permutations
 
 
+def fitness(queen_positions):
+    num_conflicts = 0
 
-if __name__ == "__main__":
-  n = int(input("Enter the number of queens: "))
-  x = int(input("Enter the number of states to generate: "))
+    for i in range(len(queen_positions)):
+        for j in range(i + 1, len(queen_positions)):
+            if queen_positions[i] == queen_positions[j] or abs(i - j) == abs(queen_positions[i] - queen_positions[j]):
+                num_conflicts += 1
 
-  states = generate_states(n, x)
+    return num_conflicts
 
-  for state in states:
-    print(state)
+
+def generate_initial_population(n):
+    population_size = int((n * n) * np.ceil(np.log2(n)))
+    initial = "".join([str(i) for i in range(1, n + 1)])
+
+    population = set()
+    while len(population) < population_size:
+        permutation = "".join(random.sample(initial, len(initial)))
+        population.add(permutation)
+
+    return list(population)
+
+
+def sort_by_fitness(population):
+    return sorted(population, key=fitness)
+
+
+def select_parents(population):
+    parents = []
+    total_fitness = sum(fitness(p) for p in population)
+
+    for individual in population:
+        fitness_value = fitness(individual)
+        probability = (len(individual) * (len(individual - 1)) - fitness_value) / total_fitness
+
+        if random.random() < probability:
+            parents.append(individual)
+
+    return parents
+
+
+def crossover(parent1, parent2):
+    i = random.randint(0, len(parent1) - 1)
+    j = random.randint(0, len(parent2) - 1)
+
+    child1 = parent1[:i] + parent2[i:j] + parent1[j:]
+    child2 = parent2[:i] + parent1[i:j] + parent2[j:]
+
+    return child1, child2
+
+
+def mutate(individual):
+    # Mutate with 5% probability
+    if random.random() < 0.05:
+        i = random.randint(0, len(individual) - 1)
+        j = random.randint(0, len(individual) - 1)
+        individual = swap_chars(individual, i, j)
+
+    return individual
+
+
+def swap_chars(string, i, j):
+    lst = list(string)
+    lst[i], lst[j] = lst[j], lst[i]
+    return "".join(lst)
+
+
+def genetic_algorithm(n):
+    population = generate_initial_population(n)
+    population = sort_by_fitness(population)
+
+    for _ in range(50):
+        parents = select_parents(population)
+        children = []
+
+        for i in range(0, len(parents), 2):
+            child1, child2 = crossover(parents[i], parents[i + 1])
+            child1 = mutate(child1)
+            child2 = mutate(child2)
+            children.extend([child1, child2])
+
+        population = sort_by_fitness(children)
+
+        best = population[0]
+        if fitness(best) == 0:
+            return best
+
+    return None
+
+genetic_algorithm(30)
