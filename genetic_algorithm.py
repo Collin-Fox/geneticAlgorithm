@@ -33,7 +33,27 @@ word_to_number = {
     "28": "S",
     "29": "T",
     "30": "U",
-    "31": "V"
+    "31": "V",
+    "32": "W",
+    "33": "X",
+    "34": "Y",
+    "35": "Z",
+    "36": "!",
+    "37": "@",
+    "38": "#",
+    "39": "$",
+    "40": "%",
+    "41": "^",
+    "42": "&",
+    "43": "*",
+    "44": "(",
+    "45": ")",
+    "46": "-",
+    "47": "_",
+    "48": "+",
+    "49": "=",
+    "50": "["
+
 }
 number_to_word = {
     "1": "1",
@@ -66,9 +86,32 @@ number_to_word = {
     "S": "28",
     "T": "29",
     "U": "30",
-    "V": "31"
+    "V": "31",
+    "W": "32",
+    "X": "33",
+    "Y": "34",
+    "Z": "35",
+    "!": "36",
+    "@": "37",
+    "#": "38",
+    "$": "39",
+    "%": "40",
+    "^": "41",
+    "&": "42",
+    "*": "43",
+    "(": "44",
+    ")": "45",
+    "-": "46",
+    "_": "47",
+    "+": "48",
+    "=": "49",
+    "[": "50"
 
 }
+
+"""
+Genetic algorithm used to solve N queens problem
+"""
 
 
 def fitness(n_queen):
@@ -222,7 +265,7 @@ def crossover(breeding_pairs):
     for letter in p0_retained:
         if letter == "?":
             p0_retained = p0_retained.replace("?", p1_replaced[0], 1)
-            #print(p0_retained)
+            # print(p0_retained)
             p1_replaced = p1_replaced[1:]
 
     child1 = p0_retained
@@ -257,8 +300,8 @@ def mutate(child):
     return child
 
 
-def run_genetic_algorithm():
-    x = generate_initial_population(20)
+def run_genetic_algorithm(n):
+    x = generate_initial_population(n)
     x = sort_by_fitness(x)
     breeding_set = sort_by_fitness(list(choose_parents(x)))
     counter = 0
@@ -270,6 +313,7 @@ def run_genetic_algorithm():
         breeding_pairs = get_breeding_pairs(breeding_set)
         print(breeding_pairs)
         breeding_children = []
+
         while len(breeding_children) < 50:
             for pair in breeding_pairs:
                 child1, child2 = crossover(pair)
@@ -286,7 +330,7 @@ def run_genetic_algorithm():
             breeding_children = list(breeding_children)
 
         # Send Children through mutate function
-        #breeding_children = mutate(breeding_children)
+        # breeding_children = mutate(breeding_children)
         breeding_children = sort_by_fitness(breeding_children)
 
         for state in breeding_children:
@@ -301,6 +345,9 @@ def run_genetic_algorithm():
     return False
 
 
-x = run_genetic_algorithm()
+n = input("Enter and integer up to 35 for the N queens problem")
+
+x = run_genetic_algorithm(int(n))
 while x is False:
-    x = run_genetic_algorithm()
+    print("Not Found, generating new initial population")
+    x = run_genetic_algorithm(int(n))
