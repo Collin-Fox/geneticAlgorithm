@@ -1,6 +1,29 @@
 import math
 import random
 
+domainKeyMap = {}
+domainValueMap = {}
+
+def generate_domain_dict():
+    first_char_code = 48
+    last_char_code = 122
+    value = 0
+    i = first_char_code
+    while i <= last_char_code:
+        if i == 58:
+            i = 65
+        if i == 91:
+            i = 97
+        domainKeyMap[chr(i)] = value
+        domainValueMap[value] = chr(i)
+        value += 1
+        i += 1
+
+def get_domain(size: int) -> str:
+    domain = ''
+    for i in range(0, size):
+        domain += domainValueMap[i]
+    return domain
 
 def fitness(state):
     n = len(state)
@@ -9,7 +32,7 @@ def fitness(state):
     # Check diagonals
     for i in range(n):
         for j in range(i + 1, n):
-            if abs(state[i] - state[j]) == j - i:
+            if abs(domainKeyMap[state[i]] - domainKeyMap[state[j]]) == j - i:
                 clashes += 1
 
     # Check rows
@@ -39,8 +62,9 @@ def generate_initial_population(n):
     pop_size = (n * n) * math.ceil(math.log(n))
 
     while len(population) < pop_size:
-        state = list(range(n))
+        state = list(get_domain(n))
         random.shuffle(state)
+        state = ''.join(state)
 
         if state not in population:
             population.append(state)
@@ -85,49 +109,56 @@ def get_breeding_parents(breeding_pool):
     return parent_pairs
 
 
-def crossover(parent1, parent2):
-
-    child1 = [None] * len(parent1)
-    child2 = [None] * len(parent2)
-
-    # Select random crossover points
-    crossover_points = sorted(random.sample(range(len(parent1)), 2))
-
-    # Copy segment to child 1
-    for i in range(crossover_points[0], crossover_points[1]):
-        child1[i] = parent1[i]
-
-    # Copy segment to child 2
-    for i in range(crossover_points[0], crossover_points[1]):
-        child2[i] = parent2[i]
-
-    # Fill in remaining values for child 1
+def crossover(parent1: str, parent2: str) -> tuple[str, str]:
+    size = len(parent1)
+    i = 1
     j = 0
-    for i in range(len(parent1)):
-        if child1[i] is None:
-            while parent2[j] in child1:
-                j += 1
-            child1[i] = parent2[j]
-            j += 1
+    while i >= j:
+        i = math.floor(random.uniform(0, size))
+        j = math.floor(random.uniform(0, size))
 
-    # Fill in remaining values for child 2
-    j = 0
-    for i in range(len(parent2)):
-        if child2[i] is None:
-            while parent1[j] in child2:
-                j += 1
-            child2[i] = parent1[j]
-            j += 1
+    replacement_dict = {}
+
+    child1 = parent1
+    child2 = parent2
+
+    for k in range(i, j + 1):
+        child2 = child2.replace(child1[k], "")
+
+    for k in range(0, i):
+        replacement_dict[child2[k]] = child1[k]
+        child1 = child1[0:k] + child2[k] + child1[k + 1:]
+
+    q = i
+    for k in range(j + 1, size):
+        replacement_dict[child2[q]] = child1[k]
+        child1 = child1[0:k] + child2[q] + child1[k + 1:]
+        q += 1
+
+    child2 = parent2
+    for k in range(len(child2)):
+        if child2[k] in replacement_dict:
+            child2 = child2[0:k] + replacement_dict[child2[k]] + child2[k + 1:]
 
     return child1, child2
 
 
-def mutate(child):
-    for i in range(len(child)):
-        if random.random() < 0.05:
-            j = random.randint(0, len(child) - 1)
-            child[i], child[j] = child[j], child[i]
-    return child
+def mutate(state: str, mutation_probability: float) -> str:
+    mutant = state[:]
+    chance = random.uniform(0, 1)
+
+    if mutation_probability < chance:
+        transpose_index1 = 0
+        transpose_index2 = 0
+        while transpose_index1 == transpose_index2:
+            transpose_index1 = math.floor(random.uniform(0, len(state)))
+            transpose_index2 = math.floor(random.uniform(0, len(state)))
+        value1 = state[transpose_index1]
+        value2 = state[transpose_index2]
+        mutant = mutant[0:transpose_index1] + value2 + mutant[transpose_index1 + 1:]
+        mutant = mutant[0:transpose_index2] + value1 + mutant[transpose_index2 + 1:]
+
+    return mutant
 
 
 question = input("Enter the number of queens: ")
@@ -194,9 +225,7 @@ def run_algorithm():
     return -1
 
 
-x = run_algorithm()
-while x == -1:
-    x = run_algorithm()
+
 
 
 def print_board(chrom):
@@ -214,4 +243,10 @@ def print_board(chrom):
 
     print_board(board)
 
-print_board(x)
+
+if __name__ == '__main__':
+    generate_domain_dict()
+    x = run_algorithm()
+    while x == -1:
+        x = run_algorithm()
+    print_board(x)
