@@ -197,3 +197,21 @@ def run_algorithm():
 x = run_algorithm()
 while x == -1:
     x = run_algorithm()
+
+
+def print_board(chrom):
+    board = []
+
+    for x in range(int(question)):
+        board.append(["x"] * int(question))
+
+    for i in range(int(question)):
+        board[chrom[i]][i] = "Q"
+
+    def print_board(board):
+        for row in board:
+            print(" ".join(row))
+
+    print_board(board)
+
+print_board(x)
