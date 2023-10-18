@@ -86,13 +86,40 @@ def get_breeding_parents(breeding_pool):
 
 
 def crossover(parent1, parent2):
-    child = []
+
+    child1 = [None] * len(parent1)
+    child2 = [None] * len(parent2)
+
+    # Select random crossover points
+    crossover_points = sorted(random.sample(range(len(parent1)), 2))
+
+    # Copy segment to child 1
+    for i in range(crossover_points[0], crossover_points[1]):
+        child1[i] = parent1[i]
+
+    # Copy segment to child 2
+    for i in range(crossover_points[0], crossover_points[1]):
+        child2[i] = parent2[i]
+
+    # Fill in remaining values for child 1
+    j = 0
     for i in range(len(parent1)):
-        if random.random() < 0.5:
-            child.append(parent1[i])
-        else:
-            child.append(parent2[i])
-    return child
+        if child1[i] is None:
+            while parent2[j] in child1:
+                j += 1
+            child1[i] = parent2[j]
+            j += 1
+
+    # Fill in remaining values for child 2
+    j = 0
+    for i in range(len(parent2)):
+        if child2[i] is None:
+            while parent1[j] in child2:
+                j += 1
+            child2[i] = parent1[j]
+            j += 1
+
+    return child1, child2
 
 
 def mutate(child):
@@ -134,14 +161,21 @@ def run_algorithm():
         print("Children:")
         for i in range(50):
             for pair in parents:
-                child = crossover(pair[0], pair[1])
-                child = mutate(child)
-                if fitness(child) == 0:
+                childOne, childTwo = crossover(pair[0], pair[1])
+                childOne = mutate(childOne)
+                childTwo = mutate(childTwo)
+                if fitness(childOne) == 0:
                     print("Solution found!")
-                    print(child)
-                    return child
-                if child not in children:
-                    children.append(child)
+                    print(childOne)
+                    return childOne
+                if fitness(childTwo) == 0:
+                    print("Solution found!")
+                    print(childTwo)
+                    return childTwo
+                if childOne not in children:
+                    children.append(childOne)
+                if childTwo not in children:
+                    children.append(childTwo)
 
         children = sort_by_fitness(children)
         for child in children:
