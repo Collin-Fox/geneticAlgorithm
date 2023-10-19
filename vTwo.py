@@ -193,8 +193,8 @@ def run_algorithm():
         for i in range(50):
             for pair in parents:
                 childOne, childTwo = crossover(pair[0], pair[1])
-                childOne = mutate(childOne)
-                childTwo = mutate(childTwo)
+                childOne = mutate(childOne, 0.05)
+                childTwo = mutate(childTwo, 0.05)
                 if fitness(childOne) == 0:
                     print("Solution found!")
                     print(childOne)
@@ -225,23 +225,16 @@ def run_algorithm():
     return -1
 
 
-
-
-
-def print_board(chrom):
-    board = []
-
-    for x in range(int(question)):
-        board.append(["x"] * int(question))
-
-    for i in range(int(question)):
-        board[chrom[i]][i] = "Q"
-
-    def print_board(board):
-        for row in board:
-            print(" ".join(row))
-
-    print_board(board)
+def print_board(queens_positions: str):
+    board = ""
+    for i in range(0, int(question)):
+        for j in range(0, int(question)):
+            if j == domainKeyMap.get(queens_positions[i]):
+                board += "Q "
+            else:
+                board += "- "
+        board += "\n"
+    print(board)
 
 
 if __name__ == '__main__':
