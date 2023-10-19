@@ -1,8 +1,13 @@
+"""
+    Created by: Collin Fox, Henry Salinas
+"""
+
 import math
 import random
 
 domainKeyMap = {}
 domainValueMap = {}
+
 
 def generate_domain_dict():
     first_char_code = 48
@@ -19,11 +24,13 @@ def generate_domain_dict():
         value += 1
         i += 1
 
+
 def get_domain(size: int) -> str:
     domain = ''
     for i in range(0, size):
         domain += domainValueMap[i]
     return domain
+
 
 def fitness(state):
     n = len(state)
